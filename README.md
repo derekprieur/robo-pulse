@@ -1,6 +1,4 @@
-Components and layout:
-a. Header: Display the app name, logo, and navigation.
-b. Main content area: Show a list of articles with a brief overview and image.
+
 c. Sidebar: Include search functionality, category filters, and user favorites.
 d. Article page: Show the full article with additional details and a link to the source.
 e. Footer: Add copyright information, social media links, and any additional information.
