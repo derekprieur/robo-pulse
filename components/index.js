@@ -1,2 +1,6 @@
 export { default as Header } from './Header'
-export { default as RecentArticles } from './RecentArticles'
+export { default as Sidebar } from './Sidebar'
+export { default as Footer } from './Footer'
+export { default as DarkModeToggle } from './DarkModeToggle'
+export { default as EverythingSearch } from './EverythingSearch'
+export { default as Comments } from './Comments'

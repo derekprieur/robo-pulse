@@ -5,6 +5,7 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
@@ -12,12 +13,12 @@ module.exports = {
       },
       backgroundColor: {
         'primary': '#0D47A1',
-        'secondary': '#E91E63',
         'background': '#F5F5F5',
       },
       textColor: {
         'primary': '#212121',
         'secondary': '#757575',
+        'alternative': '#E91E63',
       },
 
     },

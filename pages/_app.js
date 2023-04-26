@@ -1,6 +1,10 @@
 import Head from 'next/head'
-import { Header } from '../components'
 import '../styles/globals.css'
+import { Provider } from 'react-redux'
+
+import { DarkModeProvider } from '../contexts/darkModeContext';
+import store from '../store'
+import { Footer, Header } from '../components'
 
 export default function App({ Component, pageProps }) {
   return (
@@ -10,8 +14,13 @@ export default function App({ Component, pageProps }) {
         <meta name="description" content="A description of your website" />
         <link rel="icon" href="/robo.png" />
       </Head>
-      <Header />
-      <Component {...pageProps} />
+      <Provider store={store}>
+        <DarkModeProvider>
+          <Header />
+          <Component {...pageProps} />
+          <Footer />
+        </DarkModeProvider>
+      </Provider>
     </div>
   )
 }
