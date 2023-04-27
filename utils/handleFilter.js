@@ -1,11 +1,9 @@
-import { getCategory } from './getCategory';
 
-export const handleFilter = (activeFilters, articles, setFilteredArticles) => {
-    const activeFiltersSet = new Set(Object.values(activeFilters));
+export const handleFilter = (articles, setFilteredArticles, activeFilters) => {
     const validArticles = articles.filter(article => article);
-    const filterResults = validArticles.filter((article) => {
-        const articleCategory = getCategory(article.title, article.description);
-        return activeFiltersSet.size === 0 || activeFiltersSet.has(articleCategory);
+    const filteredArticles = validArticles.filter((article) => {
+        return activeFilters.length === 0 || activeFilters.some(filter => article?.title?.toLowerCase().includes(filter.toLowerCase()) || article.description.toLowerCase().includes(filter.toLowerCase()));
+
     });
-    setFilteredArticles(filterResults);
+    setFilteredArticles(filteredArticles);
 };

@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 
 import { fetchArticles } from '../utils/fetchArticles';
+import { handleFilter } from '../utils/handleFilter';
+import { useSelector } from 'react-redux';
 
-const EverythingSearch = ({ handleFilter, activeFilters }) => {
+const EverythingSearch = () => {
     const [articles, setArticles] = useState([]);
     const [filteredArticles, setFilteredArticles] = useState([]);
     const [visibleArticles, setVisibleArticles] = useState(4);
+    const activeFilters = useSelector((state) => state.filters);
 
     const showMoreArticles = () => {
         setVisibleArticles((prevVisibleArticles) => prevVisibleArticles + 4);
@@ -41,18 +44,15 @@ const EverythingSearch = ({ handleFilter, activeFilters }) => {
 
 
     useEffect(() => {
-        if (handleFilter && activeFilters) {
-            handleFilter(activeFilters, articles, setFilteredArticles);
-        } else {
-            setFilteredArticles(articles);
-        }
+        handleFilter(articles, setFilteredArticles, activeFilters);
     }, [articles, activeFilters]);
+
 
     return (
         <div className="w-full">
             <h2 className="text-primary dark:text-white text-3xl font-semibold mb-8">More Articles</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {articles.slice(0, visibleArticles).map((article, index) => (
+                {filteredArticles.slice(0, visibleArticles).map((article, index) => (
                     <div key={index} className="col-span-4 md:col-span-1 rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800">
                         <img
                             src={article.urlToImage}

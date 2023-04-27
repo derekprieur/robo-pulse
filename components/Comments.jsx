@@ -12,7 +12,6 @@ const Comments = () => {
     const articleTitle = article.title;
 
     const fetchComments = async () => {
-        console.log('fetching comments')
         const q = query(
             collection(db, 'comments'),
             where('articleTitle', '==', articleTitle)

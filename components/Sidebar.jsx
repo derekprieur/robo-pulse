@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setActiveFilters } from '../redux/filtersSlice';
 
-const Sidebar = ({ onSearch, onFilter }) => {
+const Sidebar = ({ onSearch }) => {
     const categories = ['Robotics', 'Artificial Intelligence', 'Machine Learning', 'Automation'];
-    const [activeFilters, setActiveFilters] = useState(new Set());
+    const dispatch = useDispatch();
+    const activeFilters = useSelector((state) => state.filters);
 
     const toggleFilter = (category) => {
-        const newActiveFilters = new Set(activeFilters);
-        if (newActiveFilters.has(category)) {
-            newActiveFilters.delete(category);
+        let newActiveFilters = [...activeFilters];
+        const index = newActiveFilters.indexOf(category);
+        if (index > -1) {
+            newActiveFilters.splice(index, 1);
         } else {
-            newActiveFilters.add(category);
+            newActiveFilters.push(category);
         }
-        setActiveFilters(newActiveFilters);
-        onFilter(newActiveFilters);
+        dispatch(setActiveFilters(newActiveFilters));
     };
 
     return (
@@ -32,7 +35,7 @@ const Sidebar = ({ onSearch, onFilter }) => {
                     <button
                         key={index}
                         onClick={() => toggleFilter(category)}
-                        className={`px-3 py-1 m-1 rounded ${activeFilters.has(category) ? 'bg-primary dark:bg-gray-900 text-white' : 'bg-white text-primary border border-primary'
+                        className={`px-3 py-1 m-1 rounded ${activeFilters.includes(category) ? 'bg-primary dark:bg-gray-900 text-white' : 'bg-white text-primary border border-primary'
                             }`}
                     >
                         {category}

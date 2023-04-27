@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { Sidebar, EverythingSearch, FavoriteToggle } from '../components';
 import { fetchArticles } from '../utils/fetchArticles';
@@ -9,15 +9,15 @@ import { openArticle } from '../utils/openArticle';
 import { handleImageError } from '../utils/handleImageError';
 import { handleSearch } from '../utils/handleSearch';
 import { handleFilter } from '../utils/handleFilter';
-import { setActiveFilters } from '../redux/filtersSlice';
 
 const Home = () => {
   const [articles, setArticles] = useState([]);
   const [filteredArticles, setFilteredArticles] = useState([]);
   const [favoritedArticles, setFavoritedArticles] = useState(new Set());
+  console.log('articles', articles);
+  console.log('filteredArticles', filteredArticles);
   const currentUser = useSelector((state) => state.user.currentUser);
   const activeFilters = useSelector((state) => state.filters);
-  const dispatch = useDispatch();
 
   const openArticleWrapper = (article) => {
     openArticle(article);
@@ -31,13 +31,10 @@ const Home = () => {
     handleSearch(searchTerm, articles, setFilteredArticles);
   };
 
-  const handleFilterWrapper = (activeFilters, articles) => {
-    return handleFilter(activeFilters, articles, setFilteredArticles);
-  };
-
   const handleFavoriteToggleWrapper = (index) => {
     handleFavoriteToggle(index, favoritedArticles, setFavoritedArticles, currentUser, filteredArticles);
   };
+
 
   useEffect(() => {
     const urlRobot = `https://newsapi.org/v2/top-headlines?q=robot&sortBy=publishedAt&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}`;
@@ -54,6 +51,8 @@ const Home = () => {
     ) {
       setArticles(storedArticles);
       setFilteredArticles(storedArticles);
+      console.log('articles1', articles)
+      console.log('filteredArticles1', filteredArticles)
     } else {
       fetchArticles([urlRobot, urlAI], storageKey).then((articles) => {
         console.log('articles from home fetch', articles);
@@ -69,14 +68,18 @@ const Home = () => {
         });
     }
 
-  }, [currentUser]);
+  }, [currentUser, activeFilters]);
+
+  useEffect(() => {
+    handleFilter(articles, setFilteredArticles, activeFilters);
+  }, [activeFilters, articles]);
 
   return (
     <div className="bg-background dark:bg-gray-900 min-h-screen">
       <div className="container mx-auto py-10 px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="col-span-3 md:col-span-1">
-            <Sidebar onSearch={handleSearchWrapper} onFilter={setActiveFilters} />
+            <Sidebar onSearch={handleSearchWrapper} />
           </div>
           <div className="col-span-3 md:col-span-2">
             <h1 className="text-primary dark:text-white text-3xl font-semibold mb-8">Top Headlines</h1>
@@ -86,7 +89,7 @@ const Home = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                {articles.slice(0, 6).map((article, index) => (
+                {filteredArticles.slice(0, 6).map((article, index) => (
                   <div key={index} className="rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800">
                     <img
                       src={article.urlToImage}
@@ -106,12 +109,11 @@ const Home = () => {
                     </div>
                   </div>
                 ))}
-
               </div>
             )}
           </div>
           <div className='col-span-3'>
-            <EverythingSearch handleFilter={handleFilterWrapper} activeFilters={activeFilters} />
+            <EverythingSearch />
           </div>
         </div>
       </div>
