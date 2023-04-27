@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useDispatch, useSelector } from 'react-redux';
+import { signInWithPopup, signOut as firebaseSignOut } from 'firebase/auth';
+import { setUser } from '../redux/userSlice';
 
+import { auth, provider } from '../firebaseConfig';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { DarkModeToggle } from '.';
 
@@ -17,10 +21,34 @@ const NavLink = ({ href, children, onClick }) => {
 
 const Header = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user.currentUser);
+    console.log(user, 'user');
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
     };
+
+    const signInWithGoogle = async () => {
+        try {
+            const result = await signInWithPopup(auth, provider);
+            const { displayName, email, photoURL } = result.user;
+            dispatch(setUser({ displayName, email, photoURL }));
+        } catch (error) {
+            console.error('Error signing in:', error);
+        }
+    };
+
+    const signOut = async () => {
+        try {
+            await firebaseSignOut(auth);
+            dispatch(setUser(null));
+        } catch (error) {
+            console.error('Error signing out:', error);
+        }
+    };
+
+
     return (
         <header className="bg-primary text-white dark:bg-gray-800 dark:text-white px-6 py-4">
             <div className="container mx-auto flex items-center justify-between">
@@ -42,6 +70,11 @@ const Header = () => {
                         </ul>
                     </nav>
                     <DarkModeToggle />
+                    {user ? (
+                        <button onClick={signOut} className="text-sm">Sign Out</button>
+                    ) : (
+                        <button onClick={signInWithGoogle} className="text-sm">Sign In</button>
+                    )}
                 </div>
                 <button
                     className="md:hidden focus:outline-none"
@@ -81,6 +114,13 @@ const Header = () => {
                         </ul>
                         <div className="px-6 mt-4">
                             <DarkModeToggle />
+                        </div>
+                        <div className='px-6 mt-4'>
+                            {user ? (
+                                <button onClick={signOut} className="text-sm">Sign Out</button>
+                            ) : (
+                                <button onClick={signInWithGoogle} className="text-sm">Sign In</button>
+                            )}
                         </div>
                     </nav>
                 </div>

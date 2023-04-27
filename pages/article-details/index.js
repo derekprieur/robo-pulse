@@ -7,6 +7,7 @@ import { Comments } from '../../components';
 const ArticleDetails = () => {
     const article = useSelector((state) => state.article.currentArticle);
     const [isPlaying, setIsPlaying] = useState(false);
+    console.log(article, 'article')
 
     const speak = (text) => {
         const synth = window.speechSynthesis;
