@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { Sidebar, EverythingSearch, FavoriteToggle } from '../components';
 import { fetchArticles } from '../utils/fetchArticles';
@@ -17,6 +17,7 @@ const Home = () => {
   const [favoritedArticles, setFavoritedArticles] = useState(new Set());
   const currentUser = useSelector((state) => state.user.currentUser);
   const activeFilters = useSelector((state) => state.filters);
+  const dispatch = useDispatch();
 
   const openArticleWrapper = (article) => {
     openArticle(article);
@@ -29,7 +30,6 @@ const Home = () => {
   const handleSearchWrapper = (searchTerm) => {
     handleSearch(searchTerm, articles, setFilteredArticles);
   };
-
 
   const handleFilterWrapper = (activeFilters, articles) => {
     return handleFilter(activeFilters, articles, setFilteredArticles);
@@ -56,6 +56,7 @@ const Home = () => {
       setFilteredArticles(storedArticles);
     } else {
       fetchArticles([urlRobot, urlAI], storageKey).then((articles) => {
+        console.log('articles from home fetch', articles);
         setArticles(articles);
         setFilteredArticles(articles);
       });
@@ -85,7 +86,7 @@ const Home = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                {filteredArticles.map((article, index) => (
+                {articles.slice(0, 6).map((article, index) => (
                   <div key={index} className="rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800">
                     <img
                       src={article.urlToImage}
