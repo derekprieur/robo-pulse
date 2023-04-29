@@ -32,13 +32,12 @@ const Comments = () => {
         e.preventDefault();
         if (commentText.trim() && user) {
             try {
-                console.log('adding comment')
                 await addDoc(collection(db, 'comments'), {
                     userId: user.email,
                     text: commentText,
                     displayName: user.displayName,
                     photoURL: user.photoURL,
-                    articleTitle: articleTitle, // Add the article title here
+                    articleTitle: articleTitle,
                 });
                 setCommentText('');
                 fetchComments();

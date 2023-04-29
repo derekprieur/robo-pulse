@@ -23,7 +23,6 @@ const Header = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user.currentUser);
-    console.log(user, 'user');
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -34,6 +33,7 @@ const Header = () => {
             const result = await signInWithPopup(auth, provider);
             const { displayName, email, photoURL } = result.user;
             dispatch(setUser({ displayName, email, photoURL }));
+            setIsMobileMenuOpen(false);
         } catch (error) {
             console.error('Error signing in:', error);
         }
@@ -43,6 +43,7 @@ const Header = () => {
         try {
             await firebaseSignOut(auth);
             dispatch(setUser(null));
+            setIsMobileMenuOpen(false);
         } catch (error) {
             console.error('Error signing out:', error);
         }
@@ -64,7 +65,7 @@ const Header = () => {
                     <nav>
                         <ul className="flex space-x-4">
                             <NavLink href="/">Home</NavLink>
-                            <NavLink href="/news">Categories</NavLink>
+                            <NavLink href="/categories">Categories</NavLink>
                             <NavLink href="/about">About</NavLink>
                             <NavLink href="/contact">Contact</NavLink>
                         </ul>
@@ -102,7 +103,7 @@ const Header = () => {
                             <NavLink href="/" onClick={toggleMobileMenu}>
                                 Home
                             </NavLink>
-                            <NavLink href="/news" onClick={toggleMobileMenu}>
+                            <NavLink href="/categories" onClick={toggleMobileMenu}>
                                 Categories
                             </NavLink>
                             <NavLink href="/about" onClick={toggleMobileMenu}>

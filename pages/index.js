@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useRouter } from 'next/router';
 
 import { Sidebar, EverythingSearch, FavoriteToggle } from '../components';
 import { fetchArticles } from '../utils/fetchArticles';
@@ -14,13 +15,13 @@ const Home = () => {
   const [articles, setArticles] = useState([]);
   const [filteredArticles, setFilteredArticles] = useState([]);
   const [favoritedArticles, setFavoritedArticles] = useState(new Set());
-  console.log('articles', articles);
-  console.log('filteredArticles', filteredArticles);
   const currentUser = useSelector((state) => state.user.currentUser);
   const activeFilters = useSelector((state) => state.filters);
+  const router = useRouter();
+  const dispatch = useDispatch();
 
   const openArticleWrapper = (article) => {
-    openArticle(article);
+    openArticle(article, router, dispatch);
   };
 
   const handleImageErrorWrapper = (index) => {
@@ -31,10 +32,9 @@ const Home = () => {
     handleSearch(searchTerm, articles, setFilteredArticles);
   };
 
-  const handleFavoriteToggleWrapper = (index) => {
-    handleFavoriteToggle(index, favoritedArticles, setFavoritedArticles, currentUser, filteredArticles);
+  const handleFavoriteToggleWrapper = (articleUrl) => {
+    handleFavoriteToggle(articleUrl, favoritedArticles, setFavoritedArticles, currentUser, filteredArticles);
   };
-
 
   useEffect(() => {
     const urlRobot = `https://newsapi.org/v2/top-headlines?q=robot&sortBy=publishedAt&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}`;
@@ -51,11 +51,8 @@ const Home = () => {
     ) {
       setArticles(storedArticles);
       setFilteredArticles(storedArticles);
-      console.log('articles1', articles)
-      console.log('filteredArticles1', filteredArticles)
     } else {
       fetchArticles([urlRobot, urlAI], storageKey).then((articles) => {
-        console.log('articles from home fetch', articles);
         setArticles(articles);
         setFilteredArticles(articles);
       });
@@ -66,6 +63,8 @@ const Home = () => {
         .then((favoritedArticlesSet) => {
           setFavoritedArticles(favoritedArticlesSet);
         });
+    } else {
+      setFavoritedArticles(new Set());
     }
 
   }, [currentUser, activeFilters]);
@@ -104,7 +103,7 @@ const Home = () => {
                       </h2>
                       <p className="dark:text-white">{article.description}</p>
                       <div className="flex justify-end">
-                        <FavoriteToggle index={index} favoritedArticles={favoritedArticles} handleFavoriteToggle={handleFavoriteToggleWrapper} currentUser={currentUser} />
+                        <FavoriteToggle articleUrl={article.url} favoritedArticles={favoritedArticles} handleFavoriteToggle={handleFavoriteToggleWrapper} currentUser={currentUser} />
                       </div>
                     </div>
                   </div>

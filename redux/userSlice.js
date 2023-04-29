@@ -7,11 +7,15 @@ const userSlice = createSlice({
     },
     reducers: {
         setUser: (state, action) => {
-            state.currentUser = {
-                displayName: action.payload.displayName,
-                email: action.payload.email,
-                photoURL: action.payload.photoURL,
-            };
+            if (action.payload) {
+                state.currentUser = {
+                    displayName: action.payload.displayName,
+                    email: action.payload.email,
+                    photoURL: action.payload.photoURL,
+                };
+            } else {
+                state.currentUser = null;
+            }
         },
     },
 });

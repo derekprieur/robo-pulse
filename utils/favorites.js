@@ -1,10 +1,10 @@
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
-export const saveFavoritedArticles = async (favoritedArticles, currentUser, filteredArticles) => {
+export const saveFavoritedArticles = async (favoritedArticleUrls, currentUser, filteredArticles) => {
     if (!currentUser) return;
 
-    const favoritedArticlesArray = Object.keys(favoritedArticles).map((index) => filteredArticles[index]);
+    const favoritedArticlesArray = filteredArticles.filter((article) => favoritedArticleUrls.has(article.url));
 
     try {
         const userRef = doc(db, 'favoritedArticles', currentUser.email);
@@ -14,15 +14,17 @@ export const saveFavoritedArticles = async (favoritedArticles, currentUser, filt
     }
 };
 
-export const handleFavoriteToggle = (index, favoritedArticles, setFavoritedArticles, currentUser, filteredArticles) => {
+export const handleFavoriteToggle = (articleUrl, favoritedArticles, setFavoritedArticles, currentUser, filteredArticles) => {
     setFavoritedArticles((prevState) => {
-        const newState = { ...prevState };
-        if (newState[index]) {
-            delete newState[index];
+        const newState = new Set(prevState);
+        if (newState.has(articleUrl)) {
+            newState.delete(articleUrl);
         } else {
-            newState[index] = true;
+            newState.add(articleUrl);
         }
+        console.log('Filtered articles:', filteredArticles);
         saveFavoritedArticles(newState, currentUser, filteredArticles);
         return newState;
     });
 };
+

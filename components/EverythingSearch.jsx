@@ -34,7 +34,6 @@ const EverythingSearch = () => {
         ) {
             setArticles(storedArticles);
         } else {
-            console.log('Fetching articles from API');
             fetchArticles([robotUrl, aiUrl], storageKey).then((articles) => {
                 localStorage.setItem(`${storageKey}_fetchTimestamp`, Date.now());
                 setArticles(articles);

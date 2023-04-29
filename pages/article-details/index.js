@@ -7,18 +7,16 @@ import { Comments } from '../../components';
 const ArticleDetails = () => {
     const article = useSelector((state) => state.article.currentArticle);
     const [isPlaying, setIsPlaying] = useState(false);
-    console.log(article, 'article')
+    const synth = window.speechSynthesis;
 
     const speak = (text) => {
-        const synth = window.speechSynthesis;
         const utterance = new SpeechSynthesisUtterance(text);
         synth.speak(utterance);
     };
 
     const stopSpeaking = () => {
-        const synth = window.speechSynthesis;
         synth.cancel();
-    };
+    }
 
     const readArticle = () => {
         if (isPlaying) {
@@ -29,8 +27,6 @@ const ArticleDetails = () => {
         }
         setIsPlaying(!isPlaying);
     };
-
-    console.log(article.content.split('..')[0], 'article')
 
     if (!article) {
         return <div>Loading...</div>;
