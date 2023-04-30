@@ -47,7 +47,7 @@ const Home = () => {
     if (
       storedArticles &&
       fetchTimestamp &&
-      Date.now() - parseInt(fetchTimestamp) < 60 * 1000
+      Date.now() - parseInt(fetchTimestamp) < 600 * 1000
     ) {
       setArticles(storedArticles);
       setFilteredArticles(storedArticles);
@@ -89,22 +89,24 @@ const Home = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                 {filteredArticles.slice(0, 6).map((article, index) => (
-                  <div key={index} className="rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800">
-                    <img
-                      src={article.urlToImage}
-                      alt={article.title}
-                      className="w-full h-48 object-cover cursor-pointer"
-                      onClick={() => openArticleWrapper(article)}
-                      onError={() => handleImageErrorWrapper(index)}
-                    />
-                    <div className="p-4">
-                      <h2 className="text-primary dark:text-white text-xl font-semibold mb-2 cursor-pointer" onClick={() => openArticleWrapper(article)}>
-                        {article.title}
-                      </h2>
-                      <p className="dark:text-white">{article.description}</p>
-                      <div className="flex justify-end">
-                        <FavoriteToggle articleUrl={article.url} favoritedArticles={favoritedArticles} handleFavoriteToggle={handleFavoriteToggleWrapper} currentUser={currentUser} />
+                  <div key={index} className="rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800 flex flex-col justify-between">
+                    <div>
+                      <img
+                        src={article.urlToImage}
+                        alt={article.title}
+                        className="w-full h-48 object-cover cursor-pointer"
+                        onClick={() => openArticleWrapper(article)}
+                        onError={() => handleImageErrorWrapper(index)}
+                      />
+                      <div className="p-4 flex flex-col justify-between">
+                        <h2 className="text-primary dark:text-white text-xl font-semibold mb-2 cursor-pointer" onClick={() => openArticleWrapper(article)}>
+                          {article.title}
+                        </h2>
+                        <p className="dark:text-white">{article.description}</p>
                       </div>
+                    </div>
+                    <div className="flex justify-end p-2">
+                      <FavoriteToggle articleUrl={article.url} favoritedArticles={favoritedArticles} handleFavoriteToggle={handleFavoriteToggleWrapper} currentUser={currentUser} />
                     </div>
                   </div>
                 ))}

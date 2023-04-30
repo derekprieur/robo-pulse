@@ -30,7 +30,7 @@ const EverythingSearch = () => {
         if (
             storedArticles &&
             fetchTimestamp &&
-            Date.now() - parseInt(fetchTimestamp) < 60 * 1000
+            Date.now() - parseInt(fetchTimestamp) < 600 * 1000
         ) {
             setArticles(storedArticles);
         } else {

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useDispatch, useSelector } from 'react-redux';
-import { signInWithPopup, signOut as firebaseSignOut } from 'firebase/auth';
+import { signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged } from 'firebase/auth';
 import { setUser } from '../redux/userSlice';
 
 import { auth, provider } from '../firebaseConfig';
@@ -49,6 +49,20 @@ const Header = () => {
         }
     };
 
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const { displayName, email, photoURL } = user;
+                dispatch(setUser({ displayName, email, photoURL }));
+            } else {
+                dispatch(setUser(null));
+            }
+        });
+
+        return () => {
+            unsubscribe();
+        };
+    }, [dispatch]);
 
     return (
         <header className="bg-primary text-white dark:bg-gray-800 dark:text-white px-6 py-4">
