@@ -10,11 +10,12 @@ import { openArticle } from '../utils/openArticle';
 import { handleImageError } from '../utils/handleImageError';
 import { handleSearch } from '../utils/handleSearch';
 import { handleFilter } from '../utils/handleFilter';
+import { setFavoritedArticles } from '../redux/favoritesSlice';
 
 const Home = () => {
   const [articles, setArticles] = useState([]);
   const [filteredArticles, setFilteredArticles] = useState([]);
-  const [favoritedArticles, setFavoritedArticles] = useState(new Set());
+  const favoritedArticles = useSelector((state) => state.favorites.favoritedArticles);
   const currentUser = useSelector((state) => state.user.currentUser);
   const activeFilters = useSelector((state) => state.filters);
   const router = useRouter();
@@ -30,10 +31,6 @@ const Home = () => {
 
   const handleSearchWrapper = (searchTerm) => {
     handleSearch(searchTerm, articles, setFilteredArticles);
-  };
-
-  const handleFavoriteToggleWrapper = (articleUrl) => {
-    handleFavoriteToggle(articleUrl, favoritedArticles, setFavoritedArticles, currentUser, filteredArticles);
   };
 
   useEffect(() => {
@@ -60,14 +57,17 @@ const Home = () => {
 
     if (currentUser) {
       fetchFavoritedArticles(currentUser)
-        .then((favoritedArticlesSet) => {
-          setFavoritedArticles(favoritedArticlesSet);
+        .then((favoritedArticlesArray) => {
+          dispatch(setFavoritedArticles(favoritedArticlesArray));
+        })
+        .catch((error) => {
+          console.error('Error fetching favorited articles:', error);
+          dispatch(setFavoritedArticles([]));
         });
     } else {
-      setFavoritedArticles(new Set());
+      dispatch(setFavoritedArticles([]));
     }
-
-  }, [currentUser, activeFilters]);
+  }, [currentUser, activeFilters, dispatch]);
 
   useEffect(() => {
     handleFilter(articles, setFilteredArticles, activeFilters);
@@ -89,7 +89,7 @@ const Home = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                 {filteredArticles.slice(0, 6).map((article, index) => (
-                  <div key={index} className="rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800 flex flex-col justify-between">
+                  <div key={article.url} className="rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800 flex flex-col justify-between">
                     <div>
                       <img
                         src={article.urlToImage}
@@ -106,7 +106,13 @@ const Home = () => {
                       </div>
                     </div>
                     <div className="flex justify-end p-2">
-                      <FavoriteToggle articleUrl={article.url} favoritedArticles={favoritedArticles} handleFavoriteToggle={handleFavoriteToggleWrapper} currentUser={currentUser} />
+                      <FavoriteToggle articleUrl={article.url} favoritedArticles={favoritedArticles} handleFavoriteToggle={(articleUrl, dispatch, currentUser, filteredArticles, favoritedArticles) =>
+                        handleFavoriteToggle(articleUrl, dispatch, currentUser, filteredArticles, favoritedArticles)
+                      }
+                        currentUser={currentUser}
+                        dispatch={dispatch}
+                        filteredArticles={filteredArticles}
+                      />
                     </div>
                   </div>
                 ))}
@@ -114,7 +120,7 @@ const Home = () => {
             )}
           </div>
           <div className='col-span-3'>
-            <EverythingSearch />
+            <EverythingSearch favoritedArticles={favoritedArticles} />
           </div>
         </div>
       </div>

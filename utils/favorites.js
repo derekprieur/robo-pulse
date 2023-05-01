@@ -1,30 +1,58 @@
-import { doc, setDoc } from 'firebase/firestore';
+import { arrayRemove, arrayUnion, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
-export const saveFavoritedArticles = async (favoritedArticleUrls, currentUser, filteredArticles) => {
-    if (!currentUser) return;
+import { addFavoritedArticle, removeFavoritedArticle } from '../redux/favoritesSlice';
 
-    const favoritedArticlesArray = filteredArticles.filter((article) => favoritedArticleUrls.has(article.url));
+export const saveFavoritedArticles = async (article, currentUser, add) => {
+    if (!currentUser) return;
 
     try {
         const userRef = doc(db, 'favoritedArticles', currentUser.email);
-        await setDoc(userRef, { articles: favoritedArticlesArray }, { merge: true });
+        const userDoc = await getDoc(userRef);
+
+        if (!userDoc.exists()) {
+            await setDoc(userRef, { articles: [] });
+        }
+
+        if (add) {
+            await updateDoc(userRef, {
+                articles: arrayUnion(article)
+            });
+        } else {
+            const articles = userDoc.data().articles;
+            const updatedArticles = articles.filter(
+                (favArticle) => favArticle.url !== article.url
+            );
+            await updateDoc(userRef, {
+                articles: updatedArticles
+            });
+        }
     } catch (error) {
         console.error('Error saving favorited articles:', error);
     }
 };
 
-export const handleFavoriteToggle = (articleUrl, favoritedArticles, setFavoritedArticles, currentUser, filteredArticles) => {
-    setFavoritedArticles((prevState) => {
-        const newState = new Set(prevState);
-        if (newState.has(articleUrl)) {
-            newState.delete(articleUrl);
-        } else {
-            newState.add(articleUrl);
-        }
-        console.log('Filtered articles:', filteredArticles);
-        saveFavoritedArticles(newState, currentUser, filteredArticles);
-        return newState;
-    });
-};
 
+
+export const handleFavoriteToggle = (articleUrl, dispatch, currentUser, filteredArticles, favoritedArticles) => {
+    const article = filteredArticles.find((article) => article.url === articleUrl);
+
+    if (!article) return;
+
+    if (currentUser) {
+
+        const userFavoritedArticles = favoritedArticles ?? [];
+        const articleExistsInFavorites = userFavoritedArticles.some(
+            (favArticle) => favArticle.url === articleUrl
+        );
+
+        if (articleExistsInFavorites) {
+            const articleToRemove = userFavoritedArticles.find((favArticle) => favArticle.url === articleUrl);
+            dispatch(removeFavoritedArticle(articleToRemove));
+            saveFavoritedArticles(articleToRemove, currentUser, false);
+        } else {
+            dispatch(addFavoritedArticle(article));
+            saveFavoritedArticles(article, currentUser, true);
+        }
+    }
+};

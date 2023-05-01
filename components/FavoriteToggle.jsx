@@ -1,20 +1,21 @@
-import React from 'react';
 import { toast } from 'react-hot-toast';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 
-const FavoriteToggle = ({ articleUrl, favoritedArticles, handleFavoriteToggle, currentUser }) => {
+const FavoriteToggle = ({ articleUrl, favoritedArticles, handleFavoriteToggle, currentUser, dispatch, filteredArticles }) => {
+    const isFavorited = Array.isArray(favoritedArticles) && favoritedArticles.some((article) => article.url === articleUrl);
+
     return (
         <button
             className="text-primary dark:text-white text-2xl"
             onClick={() => {
                 if (currentUser) {
-                    handleFavoriteToggle(articleUrl);
+                    handleFavoriteToggle(articleUrl, dispatch, currentUser, filteredArticles, favoritedArticles);
                 } else {
                     toast.error('Please sign in to favorite an article.');
                 }
             }}
         >
-            {favoritedArticles.has(articleUrl) ? <AiFillHeart /> : <AiOutlineHeart />}
+            {isFavorited ? <AiFillHeart /> : <AiOutlineHeart />}
         </button>
     );
 };

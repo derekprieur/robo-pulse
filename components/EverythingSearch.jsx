@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchArticles } from '../utils/fetchArticles';
 import { handleFilter } from '../utils/handleFilter';
-import { useSelector } from 'react-redux';
+import FavoriteToggle from './FavoriteToggle';
+import { handleFavoriteToggle } from '../utils/favorites';
 
-const EverythingSearch = () => {
+const EverythingSearch = ({ favoritedArticles }) => {
     const [articles, setArticles] = useState([]);
     const [filteredArticles, setFilteredArticles] = useState([]);
     const [visibleArticles, setVisibleArticles] = useState(4);
     const activeFilters = useSelector((state) => state.filters);
+    const currentUser = useSelector((state) => state.user.currentUser);
+    const dispatch = useDispatch();
 
     const showMoreArticles = () => {
         setVisibleArticles((prevVisibleArticles) => prevVisibleArticles + 4);
@@ -52,15 +56,27 @@ const EverythingSearch = () => {
             <h2 className="text-primary dark:text-white text-3xl font-semibold mb-8">More Articles</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {filteredArticles.slice(0, visibleArticles).map((article, index) => (
-                    <div key={index} className="col-span-4 md:col-span-1 rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800">
-                        <img
-                            src={article.urlToImage}
-                            alt={article.title}
-                            className="w-full h-48 object-cover cursor-pointer"
-                        />
-                        <div className="p-4">
-                            <h3 className="text-primary dark:text-white text-xl font-semibold mb-2">{article.title}</h3>
-                            <p className="dark:text-white">{article.description}</p>
+                    <div key={article.url} className="col-span-4 md:col-span-1 rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800 flex flex-col justify-between">
+                        <div>
+                            <img
+                                src={article.urlToImage}
+                                alt={article.title}
+                                className="w-full h-48 object-cover cursor-pointer"
+                            />
+                            <div className="p-4">
+                                <h3 className="text-primary dark:text-white text-xl font-semibold mb-2">{article.title}</h3>
+                                <p className="dark:text-white">{article.description}</p>
+                            </div>
+                        </div>
+                        <div className="flex justify-end p-2">
+                            <FavoriteToggle
+                                articleUrl={article.url}
+                                favoritedArticles={favoritedArticles}
+                                handleFavoriteToggle={(articleUrl) => {
+                                    handleFavoriteToggle(articleUrl, dispatch, currentUser, filteredArticles, favoritedArticles);
+                                }}
+                                currentUser={currentUser}
+                            />
                         </div>
                     </div>
                 ))}
