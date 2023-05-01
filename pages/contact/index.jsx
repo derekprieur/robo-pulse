@@ -15,11 +15,7 @@ const Contact = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const response = await fetch('https://formspree.io/f/xnqywabw', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
+            method: 'POST', headers: { 'Content-Type': 'application/json', }, body: JSON.stringify(formData),
         });
 
         if (response.ok) {
@@ -39,11 +35,14 @@ const Contact = () => {
     };
     return (
         <div className="bg-background dark:bg-gray-900 min-h-screen">
-            <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
+            <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 max-w-4xl">
                 <h1 className="text-primary dark:text-white text-3xl font-semibold mb-8">Contact Us</h1>
                 <div className="rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800 p-4 md:p-6 lg:p-8">
                     <p className="text-secondary dark:text-white mb-4">
-                        If you have any questions, comments, or suggestions, please feel free to reach out to us using the form below. We'd love to hear from you!
+                        If you have any questions, comments, or suggestions, please feel free to reach out to us using the form below.
+                    </p>
+                    <p className="text-secondary dark:text-white mb-4">
+                        We'd love to hear from you!
                     </p>
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
@@ -66,7 +65,7 @@ const Contact = () => {
                             ></textarea>
                         </div>
                         <div className="flex items-center justify-between">
-                            <button className="bg-primary hover:bg-primary-darker text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                            <button className="bg-primary dark:bg-gray-200 hover:bg-primary/80 dark:hover:bg-gray-400 text-white dark:text-gray-900 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-300" type="submit">
                                 Send
                             </button>
                         </div>

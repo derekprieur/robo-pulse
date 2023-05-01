@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { FaHeadphones } from 'react-icons/fa';
 
 import { Comments } from '../../components';
+import { formatDate } from '../../utils/formatDate';
 
 const ArticleDetails = () => {
     const article = useSelector((state) => state.article.currentArticle);
@@ -45,14 +46,14 @@ const ArticleDetails = () => {
                         />
                         <div className="p-4 md:p-6">
                             <p className="text-secondary dark:text-white mb-2">Author: {article.author}</p>
-                            <p className="text-secondary dark:text-white mb-2">Published at: {article.publishedAt}</p>
+                            <p className="text-secondary dark:text-white mb-2">Published Date: {formatDate(article.publishedAt)}</p>
                             <p className="text-secondary dark:text-white mb-4">Source: {article.source.name}</p>
                             <p className="text-secondary dark:text-white mb-4">{article.content.split('…')[0]}...</p>
                             <div className='flex items-center justify-between'>
                                 <a href={article.url} target="_blank" rel="noopener noreferrer" className="text-primary dark:text-secondary font-semibold">
                                     Read more at {article.source.name}
                                 </a>
-                                <FaHeadphones className='text-xl text-primary cursor-pointer' onClick={readArticle} />
+                                <FaHeadphones className='text-xl text-primary dark:text-white cursor-pointer' onClick={readArticle} />
                             </div>
                         </div>
                     </div>

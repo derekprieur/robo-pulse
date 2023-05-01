@@ -1,30 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+
+import { categoriesData } from '../../constants/categories';
+import { ShowMoreButton } from '../../components';
 
 const Categories = () => {
-    const categoriesData = [
-        {
-            id: 1,
-            name: 'Robotics',
-            query: 'robot',
-        },
-        {
-            id: 2,
-            name: 'Artificial Intelligence',
-            query: 'artificial%20intelligence',
-        },
-        {
-            id: 3,
-            name: 'Machine Learning',
-            query: 'machine%20learning',
-        },
-        {
-            id: 4,
-            name: 'Automation',
-            query: 'automation',
-        },
-    ];
-
     const [articles, setArticles] = useState([]);
+    const [currentCategory, setCurrentCategory] = useState('Robotics')
+    const [visibleArticles, setVisibleArticles] = useState(6);
 
     const fetchCategoryArticles = async (query) => {
         const url = `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}`;
@@ -35,6 +17,14 @@ const Categories = () => {
         setArticles(data.articles);
     };
 
+    useEffect(() => {
+        fetchCategoryArticles('robot');
+    }, [])
+
+    const showMoreArticles = () => {
+        setVisibleArticles((prevVisibleArticles) => prevVisibleArticles + 6);
+    };
+
     return (
         <div className="bg-background dark:bg-gray-900 min-h-screen">
             <div className="container mx-auto py-10 px-4">
@@ -42,19 +32,23 @@ const Categories = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {categoriesData.map((category) => (
                         <div
-                            key={category.id}
-                            className="rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800 p-4 cursor-pointer"
-                            onClick={() => fetchCategoryArticles(category.query)}
+                            key={category.id + category.name}
+                            className={`rounded-lg overflow-hidden shadow-md p-4 cursor-pointer ${currentCategory === category.name ? 'bg-primary dark:bg-gray-600 text-white dark:text-gray-200' : 'bg-white dark:bg-gray-800 text-primary dark:text-white'
+                                }`}
+                            onClick={() => {
+                                setCurrentCategory(category.name);
+                                fetchCategoryArticles(category.query)
+                            }}
                         >
-                            <h2 className="text-primary dark:text-white text-xl font-semibold mb-2">{category.name}</h2>
+                            <h2 className="dark:text-white text-xl font-semibold mb-2">{category.name}</h2>
                         </div>
                     ))}
                 </div>
                 {articles?.length > 0 && (
                     <div className="mt-10">
-                        <h2 className="text-primary dark:text-white text-2xl font-semibold mb-4">Articles</h2>
+                        <h2 className="text-primary dark:text-white text-2xl font-semibold mb-4">Articles for {currentCategory}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {articles.map((article, index) => (
+                            {articles.slice(0, visibleArticles).map((article, index) => (
                                 <div key={index} className="rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800">
                                     <img
                                         src={article.urlToImage}
@@ -70,6 +64,9 @@ const Categories = () => {
                                 </div>
                             ))}
                         </div>
+                        {visibleArticles < articles.length && (
+                            <ShowMoreButton onClick={showMoreArticles} />
+                        )}
                     </div>
                 )}
             </div>

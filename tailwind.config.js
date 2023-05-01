@@ -20,7 +20,6 @@ module.exports = {
         'secondary': '#757575',
         'alternative': '#E91E63',
       },
-
     },
   },
   plugins: [],

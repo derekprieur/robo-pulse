@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 
-import { auth, db } from '../firebaseConfig';
+import { db } from '../firebaseConfig';
 
 const Comments = () => {
     const [comments, setComments] = useState([]);
@@ -33,11 +33,7 @@ const Comments = () => {
         if (commentText.trim() && user) {
             try {
                 await addDoc(collection(db, 'comments'), {
-                    userId: user.email,
-                    text: commentText,
-                    displayName: user.displayName,
-                    photoURL: user.photoURL,
-                    articleTitle: articleTitle,
+                    userId: user.email, text: commentText, displayName: user.displayName, photoURL: user.photoURL, articleTitle: articleTitle,
                 });
                 setCommentText('');
                 fetchComments();
@@ -58,20 +54,14 @@ const Comments = () => {
                     <li key={index} className="border border-gray-300 dark:border-gray-700 p-4 rounded bg-white dark:bg-gray-800">
                         <div className="flex items-center space-x-2 mb-2">
                             <img src={comment.photoURL} alt={comment.displayName} className="w-8 h-8 rounded-full" />
-                            <span className="font-semibold">{comment.displayName}</span>
+                            <span className="font-semibold dark:text-white">{comment.displayName}</span>
                         </div>
-                        <p>{comment.text}</p>
+                        <p className='dark:text-white'>{comment.text}</p>
                     </li>
                 ))}
             </ul>
             <form onSubmit={handleSubmit}>
-                <textarea
-                    className="w-full p-2 mb-4 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded"
-                    rows="4"
-                    placeholder="Write a comment..."
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                />
+                <textarea className="w-full p-2 mb-4 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded" rows="4" placeholder="Write a comment..." value={commentText} onChange={(e) => setCommentText(e.target.value)} />
                 <button type="submit" className="bg-primary dark:bg-secondary text-white font-semibold px-4 py-2 rounded">
                     Submit
                 </button>

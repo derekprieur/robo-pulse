@@ -11,13 +11,14 @@ import { handleImageError } from '../utils/handleImageError';
 import { handleSearch } from '../utils/handleSearch';
 import { handleFilter } from '../utils/handleFilter';
 import { setFavoritedArticles } from '../redux/favoritesSlice';
+import { formatDate } from '../utils/formatDate';
 
 const Home = () => {
   const [articles, setArticles] = useState([]);
   const [filteredArticles, setFilteredArticles] = useState([]);
   const favoritedArticles = useSelector((state) => state.favorites.favoritedArticles);
   const currentUser = useSelector((state) => state.user.currentUser);
-  const activeFilters = useSelector((state) => state.filters);
+  const activeFilters = useSelector((state) => state.filters.activeFilters);
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -33,9 +34,23 @@ const Home = () => {
     handleSearch(searchTerm, articles, setFilteredArticles);
   };
 
+  const filterByKeywords = (articles) => {
+    const keywords = ['robot', 'robotics', 'artificial intelligence', 'machine learning', 'automation',];
+
+    return articles.filter((article) => {
+      const title = article.title ? article.title.toLowerCase() : '';
+      const description = article.description ? article.description.toLowerCase() : '';
+
+      return keywords.some((keyword) => title.includes(keyword) || description.includes(keyword));
+    });
+  };
+
   useEffect(() => {
-    const urlRobot = `https://newsapi.org/v2/top-headlines?q=robot&sortBy=publishedAt&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}`;
-    const urlAI = `https://newsapi.org/v2/top-headlines?q=artificial%20intelligence&sortBy=publishedAt&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}`;
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - 30);
+    const fromDateString = fromDate.toISOString().split('T')[0];
+    const urlRobot = `https://newsapi.org/v2/everything?q=robot&sortBy=publishedAt&from=${fromDateString}&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}&language=en`;
+    const urlAI = `https://newsapi.org/v2/everything?q=artificial+intelligence&sortBy=publishedAt&from=${fromDateString}&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}&language=en`;
     const storageKey = 'topHeadlines';
 
     const storedArticles = JSON.parse(localStorage.getItem(storageKey));
@@ -46,12 +61,14 @@ const Home = () => {
       fetchTimestamp &&
       Date.now() - parseInt(fetchTimestamp) < 600 * 1000
     ) {
-      setArticles(storedArticles);
-      setFilteredArticles(storedArticles);
+      const filteredStoredArticles = filterByKeywords(storedArticles);
+      setArticles(filteredStoredArticles);
+      setFilteredArticles(filteredStoredArticles);
     } else {
       fetchArticles([urlRobot, urlAI], storageKey).then((articles) => {
-        setArticles(articles);
-        setFilteredArticles(articles);
+        const filteredFetchedArticles = filterByKeywords(articles);
+        setArticles(filteredFetchedArticles);
+        setFilteredArticles(filteredFetchedArticles);
       });
     }
 
@@ -69,6 +86,7 @@ const Home = () => {
     }
   }, [currentUser, activeFilters, dispatch]);
 
+
   useEffect(() => {
     handleFilter(articles, setFilteredArticles, activeFilters);
   }, [activeFilters, articles]);
@@ -81,7 +99,7 @@ const Home = () => {
             <Sidebar onSearch={handleSearchWrapper} />
           </div>
           <div className="col-span-3 md:col-span-2">
-            <h1 className="text-primary dark:text-white text-3xl font-semibold mb-8">Top Headlines</h1>
+            <h1 className="text-primary dark:text-white text-3xl font-semibold mb-8">Breaking News</h1>
             {filteredArticles.length === 0 ? (
               <div className="text-center text-secondary dark:text-white text-xl">
                 No articles found for the selected filters.
@@ -89,7 +107,7 @@ const Home = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                 {filteredArticles.slice(0, 6).map((article, index) => (
-                  <div key={article.url} className="rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800 flex flex-col justify-between">
+                  <div key={article.url + index} className="rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800 flex flex-col justify-between">
                     <div>
                       <img
                         src={article.urlToImage}
@@ -105,7 +123,8 @@ const Home = () => {
                         <p className="dark:text-white">{article.description}</p>
                       </div>
                     </div>
-                    <div className="flex justify-end p-2">
+                    <div className="flex justify-between px-4 pb-2">
+                      <p className="text-secondary dark:text-white">{formatDate(article.publishedAt)}</p>
                       <FavoriteToggle articleUrl={article.url} favoritedArticles={favoritedArticles} handleFavoriteToggle={(articleUrl, dispatch, currentUser, filteredArticles, favoritedArticles) =>
                         handleFavoriteToggle(articleUrl, dispatch, currentUser, filteredArticles, favoritedArticles)
                       }
