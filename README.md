@@ -1,5 +1,4 @@
 g. User authentication (optional): Allow users to sign up and log in to save their favorites and preferences.
-b. Analytics: Integrate Google Analytics or a similar service to track user behavior and app performance.
 
 AI/ML powered article recommendations based on user preferences and browsing history
 User authentication and profile management (for personalized recommendations and saved articles)
