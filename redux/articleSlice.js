@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     currentArticle: null,
+    filteredArticles: [],
 };
 
 const articleSlice = createSlice({
@@ -11,9 +12,12 @@ const articleSlice = createSlice({
         setCurrentArticle: (state, action) => {
             state.currentArticle = action.payload;
         },
+        setFilteredArticles: (state, action) => {
+            state.filteredArticles = action.payload;
+        },
     },
 });
 
-export const { setCurrentArticle } = articleSlice.actions;
+export const { setCurrentArticle, setFilteredArticles } = articleSlice.actions;
 
 export default articleSlice.reducer;

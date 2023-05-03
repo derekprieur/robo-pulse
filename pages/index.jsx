@@ -12,13 +12,15 @@ import { handleSearch } from '../utils/handleSearch';
 import { handleFilter } from '../utils/handleFilter';
 import { setFavoritedArticles } from '../redux/favoritesSlice';
 import { formatDate } from '../utils/formatDate';
+import { removeDuplicateTitles } from '../utils/removeDuplicateTitles';
+import { setCurrentArticle, setFilteredArticles } from '../redux/articleSlice';
 
 const Home = () => {
   const [articles, setArticles] = useState([]);
-  const [filteredArticles, setFilteredArticles] = useState([]);
   const favoritedArticles = useSelector((state) => state.favorites.favoritedArticles);
   const currentUser = useSelector((state) => state.user.currentUser);
   const activeFilters = useSelector((state) => state.filters.activeFilters);
+  const filteredArticles = useSelector((state) => state.article.filteredArticles);
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -62,13 +64,15 @@ const Home = () => {
       Date.now() - parseInt(fetchTimestamp) < 600 * 1000
     ) {
       const filteredStoredArticles = filterByKeywords(storedArticles);
-      setArticles(filteredStoredArticles);
-      setFilteredArticles(filteredStoredArticles);
+      const uniqueFilteredStoredArticles = removeDuplicateTitles(filteredStoredArticles);
+      setArticles(uniqueFilteredStoredArticles);
+      dispatch(setFilteredArticles(uniqueFilteredStoredArticles));
     } else {
       fetchArticles([urlRobot, urlAI], storageKey).then((articles) => {
         const filteredFetchedArticles = filterByKeywords(articles);
-        setArticles(filteredFetchedArticles);
-        setFilteredArticles(filteredFetchedArticles);
+        const uniqueFilteredFetchedArticles = removeDuplicateTitles(filteredFetchedArticles);
+        setArticles(uniqueFilteredFetchedArticles);
+        dispatch(setFilteredArticles(uniqueFilteredFetchedArticles));
       });
     }
 
@@ -88,7 +92,8 @@ const Home = () => {
 
 
   useEffect(() => {
-    handleFilter(articles, setFilteredArticles, activeFilters);
+    const filtered = handleFilter(articles, activeFilters);
+    dispatch(setFilteredArticles(filtered));
   }, [activeFilters, articles]);
 
   return (
@@ -139,7 +144,7 @@ const Home = () => {
             )}
           </div>
           <div className='col-span-3'>
-            <EverythingSearch favoritedArticles={favoritedArticles} />
+            <EverythingSearch />
           </div>
         </div>
       </div>

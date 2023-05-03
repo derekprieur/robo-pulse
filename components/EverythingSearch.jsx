@@ -1,71 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 
-import { fetchArticles } from '../utils/fetchArticles';
-import { handleFilter } from '../utils/handleFilter';
 import FavoriteToggle from './FavoriteToggle';
 import { handleFavoriteToggle } from '../utils/favorites';
-import { handleSearch } from '../utils/handleSearch';
 import { openArticle } from '../utils/openArticle';
 import { ShowMoreButton } from '.';
 import { formatDate } from '../utils/formatDate';
 
-const EverythingSearch = ({ favoritedArticles }) => {
-    const [articles, setArticles] = useState([]);
-    const [filteredArticles, setFilteredArticles] = useState([]);
+const EverythingSearch = () => {
     const [visibleArticles, setVisibleArticles] = useState(4);
-    const activeFilters = useSelector((state) => state.filters.activeFilters);
-    const searchTerm = useSelector((state) => state.filters.searchTerm);
+    const filteredArticles = useSelector((state) => state.article.filteredArticles);
+    const favoritedArticles = useSelector((state) => state.favorites.favoritedArticles);
     const currentUser = useSelector((state) => state.user.currentUser);
     const dispatch = useDispatch();
     const router = useRouter();
+    console.log(filteredArticles, 'filteredArticles');
 
     const showMoreArticles = () => {
         setVisibleArticles((prevVisibleArticles) => prevVisibleArticles + 4);
     };
 
-    useEffect(() => {
-        const fromDate = new Date();
-        fromDate.setDate(fromDate.getDate() - 30);
-        const fromDateString = fromDate.toISOString().split('T')[0];
-
-        const robotUrl = `https://newsapi.org/v2/everything?q=robot&sortBy=publishedAt&from=${fromDateString}&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}&language=en`;
-        const aiUrl = `https://newsapi.org/v2/everything?q=artificial+intelligence&sortBy=publishedAt&from=${fromDateString}&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}&language=en`;
-
-        const storageKey = 'everythingSearch';
-
-        const storedArticles = JSON.parse(localStorage.getItem(storageKey));
-        const fetchTimestamp = localStorage.getItem(`${storageKey}_fetchTimestamp`);
-
-        if (
-            storedArticles &&
-            fetchTimestamp &&
-            Date.now() - parseInt(fetchTimestamp) < 600 * 1000
-        ) {
-            setArticles(storedArticles);
-        } else {
-            fetchArticles([robotUrl, aiUrl], storageKey).then((articles) => {
-                localStorage.setItem(`${storageKey}_fetchTimestamp`, Date.now());
-                setArticles(articles);
-            });
-        }
-    }, []);
-
-
-    useEffect(() => {
-        handleFilter(articles, setFilteredArticles, activeFilters);
-    }, [articles, activeFilters]);
-
-    useEffect(() => {
-        handleSearch(searchTerm, articles, setFilteredArticles);
-    }, [searchTerm, articles]);
-
     return (
         <div className="w-full">
             <h2 className="text-primary dark:text-white text-3xl font-semibold mb-8">More Recent Articles</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {filteredArticles.slice(0, visibleArticles).map((article, index) => (
+                {filteredArticles.slice(6, 6 + visibleArticles).map((article, index) => (
                     <div key={article.url + index} className="col-span-4 md:col-span-1 rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800 flex flex-col justify-between">
                         <div>
                             <img
@@ -93,7 +53,7 @@ const EverythingSearch = ({ favoritedArticles }) => {
                     </div>
                 ))}
             </div>
-            {visibleArticles < filteredArticles.length && (
+            {visibleArticles < filteredArticles.length - 6 && (
                 <ShowMoreButton onClick={showMoreArticles} />
             )}
         </div>

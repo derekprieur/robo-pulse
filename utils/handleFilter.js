@@ -1,9 +1,13 @@
-
-export const handleFilter = (articles, setFilteredArticles, activeFilters) => {
-    const validArticles = articles.filter(article => article);
+export const handleFilter = (articles, activeFilters) => {
+    const validArticles = articles.filter((article) => article);
     const filteredArticles = validArticles.filter((article) => {
-        return activeFilters.length === 0 || activeFilters.some(filter => article?.title?.toLowerCase().includes(filter.toLowerCase()) || article.description.toLowerCase().includes(filter.toLowerCase()));
-
+        return activeFilters.length === 0 || activeFilters.some((filter) => {
+            const lowerCaseFilter = filter.toLowerCase();
+            return (
+                article?.title?.toLowerCase().includes(lowerCaseFilter) ||
+                article.description.toLowerCase().includes(lowerCaseFilter)
+            );
+        });
     });
-    setFilteredArticles(filteredArticles);
+    return filteredArticles;
 };
