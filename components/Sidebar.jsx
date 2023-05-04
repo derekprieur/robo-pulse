@@ -8,8 +8,6 @@ const Sidebar = ({ onSearch }) => {
     const activeFilters = useSelector((state) => state.filters.activeFilters);
     const searchTerm = useSelector((state) => state.filters.searchTerm);
 
-    console.log('searchTerm', searchTerm)
-
     const toggleFilter = (category) => {
         let newActiveFilters = [...activeFilters];
         const index = newActiveFilters.indexOf(category);

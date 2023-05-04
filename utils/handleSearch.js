@@ -9,6 +9,5 @@ export const handleSearch = (searchTerm, articles, dispatch) => {
 
         return title.includes(searchTerm) || description.includes(searchTerm);
     });
-    console.log('filtered', filtered);
     dispatch(setFilteredArticles(filtered));
 };

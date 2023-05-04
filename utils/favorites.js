@@ -41,9 +41,7 @@ export const handleFavoriteToggle = (articleUrl, dispatch, currentUser, filtered
     } else {
         article = filteredArticles.find((article) => article.url === articleUrl);
     }
-    console.log('article', article)
     if (!article) return;
-    console.log('test')
 
     if (currentUser) {
 

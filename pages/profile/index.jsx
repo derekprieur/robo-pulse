@@ -11,7 +11,6 @@ const Profile = () => {
 
     useEffect(() => {
         if (currentUser) {
-            console.log('Fetching favorited articles for:', currentUser);
             fetchFavoritedArticles(currentUser)
                 .then((favoritedArticlesArray) => {
                     favoritedArticlesArray.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
