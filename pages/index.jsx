@@ -1,39 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useRouter } from 'next/router';
 
-import { Sidebar, EverythingSearch, FavoriteToggle } from '../components';
+import { Sidebar, EverythingSearch, FavoriteToggle, ArticleCard } from '../components';
 import { fetchArticles } from '../utils/fetchArticles';
 import { fetchFavoritedArticles } from '../utils/fetchFavoritedArticles';
-import { handleFavoriteToggle } from '../utils/favorites';
-import { openArticle } from '../utils/openArticle';
-import { handleImageError } from '../utils/handleImageError';
 import { handleSearch } from '../utils/handleSearch';
 import { handleFilter } from '../utils/handleFilter';
 import { setFavoritedArticles } from '../redux/favoritesSlice';
-import { formatDate } from '../utils/formatDate';
 import { removeDuplicateTitles } from '../utils/removeDuplicateTitles';
-import { setCurrentArticle, setFilteredArticles } from '../redux/articleSlice';
+import { setFilteredArticles } from '../redux/articleSlice';
 
 const Home = () => {
   const [articles, setArticles] = useState([]);
-  const favoritedArticles = useSelector((state) => state.favorites.favoritedArticles);
   const currentUser = useSelector((state) => state.user.currentUser);
   const activeFilters = useSelector((state) => state.filters.activeFilters);
   const filteredArticles = useSelector((state) => state.article.filteredArticles);
-  const router = useRouter();
   const dispatch = useDispatch();
 
-  const openArticleWrapper = (article) => {
-    openArticle(article, router, dispatch);
-  };
-
-  const handleImageErrorWrapper = (index) => {
-    handleImageError(index, setFilteredArticles);
-  };
-
   const handleSearchWrapper = (searchTerm) => {
-    handleSearch(searchTerm, articles, setFilteredArticles);
+    handleSearch(searchTerm, articles, dispatch);
   };
 
   const filterByKeywords = (articles) => {
@@ -51,8 +36,8 @@ const Home = () => {
     const fromDate = new Date();
     fromDate.setDate(fromDate.getDate() - 30);
     const fromDateString = fromDate.toISOString().split('T')[0];
-    const urlRobot = `https://newsapi.org/v2/everything?q=robot&sortBy=publishedAt&from=${fromDateString}&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}&language=en`;
-    const urlAI = `https://newsapi.org/v2/everything?q=artificial+intelligence&sortBy=publishedAt&from=${fromDateString}&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}&language=en`;
+    const urlRobot = `/api/news?query=robot&sortBy=publishedAt&from=${fromDateString}`;
+    const urlAI = `/api/news?query=artificial+intelligence&sortBy=publishedAt&from=${fromDateString}`;
     const storageKey = 'topHeadlines';
 
     const storedArticles = JSON.parse(localStorage.getItem(storageKey));
@@ -112,33 +97,7 @@ const Home = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                 {filteredArticles.slice(0, 6).map((article, index) => (
-                  <div key={article.url + index} className="rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800 flex flex-col justify-between">
-                    <div>
-                      <img
-                        src={article.urlToImage}
-                        alt={article.title}
-                        className="w-full h-48 object-cover cursor-pointer"
-                        onClick={() => openArticleWrapper(article)}
-                        onError={() => handleImageErrorWrapper(index)}
-                      />
-                      <div className="p-4 flex flex-col justify-between">
-                        <h2 className="text-primary dark:text-white text-xl font-semibold mb-2 cursor-pointer" onClick={() => openArticleWrapper(article)}>
-                          {article.title}
-                        </h2>
-                        <p className="dark:text-white">{article.description}</p>
-                      </div>
-                    </div>
-                    <div className="flex justify-between px-4 pb-2">
-                      <p className="text-secondary dark:text-white">{formatDate(article.publishedAt)}</p>
-                      <FavoriteToggle articleUrl={article.url} favoritedArticles={favoritedArticles} handleFavoriteToggle={(articleUrl, dispatch, currentUser, filteredArticles, favoritedArticles) =>
-                        handleFavoriteToggle(articleUrl, dispatch, currentUser, filteredArticles, favoritedArticles)
-                      }
-                        currentUser={currentUser}
-                        dispatch={dispatch}
-                        filteredArticles={filteredArticles}
-                      />
-                    </div>
-                  </div>
+                  <ArticleCard article={article} index={index} />
                 ))}
               </div>
             )}

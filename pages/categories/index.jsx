@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
 import { categoriesData } from '../../constants/categories';
-import { ShowMoreButton } from '../../components';
+import { ArticleCard, Button } from '../../components';
+import { showMoreArticles } from '../../utils/showMoreArticles';
 
 const Categories = () => {
     const [articles, setArticles] = useState([]);
@@ -9,7 +10,10 @@ const Categories = () => {
     const [visibleArticles, setVisibleArticles] = useState(6);
 
     const fetchCategoryArticles = async (query) => {
-        const url = `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}`;
+        const fromDate = new Date();
+        fromDate.setDate(fromDate.getDate() - 30);
+        const fromDateString = fromDate.toISOString().split('T')[0];
+        const url = `/api/news?query=${query}&sortBy=publishedAt&from=${fromDateString}`;
 
         const response = await fetch(url);
         const data = await response.json();
@@ -17,19 +21,16 @@ const Categories = () => {
         setArticles(data.articles);
     };
 
+
     useEffect(() => {
         fetchCategoryArticles('robot');
     }, [])
-
-    const showMoreArticles = () => {
-        setVisibleArticles((prevVisibleArticles) => prevVisibleArticles + 6);
-    };
 
     return (
         <div className="bg-background dark:bg-gray-900 min-h-screen">
             <div className="container mx-auto py-10 px-4">
                 <h1 className="text-primary dark:text-white text-3xl font-semibold mb-8">Categories</h1>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-h-56 lg:max-h-full overflow-y-scroll lg:overflow-y-visible hide-scrollbar">
                     {categoriesData.map((category) => (
                         <div
                             key={category.id + category.name}
@@ -49,23 +50,11 @@ const Categories = () => {
                         <h2 className="text-primary dark:text-white text-2xl font-semibold mb-4">Articles for {currentCategory}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {articles.slice(0, visibleArticles).map((article, index) => (
-                                <div key={index} className="rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800">
-                                    <img
-                                        src={article.urlToImage}
-                                        alt={article.title}
-                                        className="w-full h-48 object-cover"
-                                    />
-                                    <div className="p-4">
-                                        <h3 className="text-primary dark:text-white text-xl font-semibold mb-2">
-                                            {article.title}
-                                        </h3>
-                                        <p className="text-secondary dark:text-white">{article.description}</p>
-                                    </div>
-                                </div>
+                                <ArticleCard article={article} index={index} categoryArticles={articles} />
                             ))}
                         </div>
                         {visibleArticles < articles.length && (
-                            <ShowMoreButton onClick={showMoreArticles} />
+                            <Button onClick={() => showMoreArticles(setVisibleArticles, 6)} text='Show More' />
                         )}
                     </div>
                 )}

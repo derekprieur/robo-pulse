@@ -5,8 +5,9 @@ import { useRouter } from 'next/router';
 import FavoriteToggle from './FavoriteToggle';
 import { handleFavoriteToggle } from '../utils/favorites';
 import { openArticle } from '../utils/openArticle';
-import { ShowMoreButton } from '.';
 import { formatDate } from '../utils/formatDate';
+import { showMoreArticles } from '../utils/showMoreArticles';
+import { Button } from '.';
 
 const EverythingSearch = () => {
     const [visibleArticles, setVisibleArticles] = useState(4);
@@ -15,11 +16,6 @@ const EverythingSearch = () => {
     const currentUser = useSelector((state) => state.user.currentUser);
     const dispatch = useDispatch();
     const router = useRouter();
-    console.log(filteredArticles, 'filteredArticles');
-
-    const showMoreArticles = () => {
-        setVisibleArticles((prevVisibleArticles) => prevVisibleArticles + 4);
-    };
 
     return (
         <div className="w-full">
@@ -54,7 +50,7 @@ const EverythingSearch = () => {
                 ))}
             </div>
             {visibleArticles < filteredArticles.length - 6 && (
-                <ShowMoreButton onClick={showMoreArticles} />
+                <Button onClick={() => showMoreArticles(setVisibleArticles, 4)} text='Show More' />
             )}
         </div>
     );

@@ -34,10 +34,16 @@ export const saveFavoritedArticles = async (article, currentUser, add) => {
 
 
 
-export const handleFavoriteToggle = (articleUrl, dispatch, currentUser, filteredArticles, favoritedArticles) => {
-    const article = filteredArticles.find((article) => article.url === articleUrl);
-
+export const handleFavoriteToggle = (articleUrl, dispatch, currentUser, filteredArticles, favoritedArticles, categoryArticles) => {
+    let article;
+    if (categoryArticles) {
+        article = categoryArticles.find((article) => article.url === articleUrl);
+    } else {
+        article = filteredArticles.find((article) => article.url === articleUrl);
+    }
+    console.log('article', article)
     if (!article) return;
+    console.log('test')
 
     if (currentUser) {
 

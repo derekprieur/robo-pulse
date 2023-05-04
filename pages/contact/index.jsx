@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { Button } from '../../components';
 
 const Contact = () => {
     const [formData, setFormData] = useState({
@@ -57,7 +58,7 @@ const Contact = () => {
                             </label>
                             <input className="shadow appearance-none border rounded w-full py-2 px-3 text-secondary dark:text-white leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Your Email" name="email" value={formData.email} onChange={handleChange} />
                         </div>
-                        <div className="mb-4">
+                        <div>
                             <label className="block text-secondary dark:text-white text-sm font-bold mb-2" htmlFor="message">
                                 Message
                             </label>
@@ -65,12 +66,9 @@ const Contact = () => {
                             ></textarea>
                         </div>
                         <div className="flex items-center justify-between">
-                            <button className="bg-primary dark:bg-gray-200 hover:bg-primary/80 dark:hover:bg-gray-400 text-white dark:text-gray-900 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-300" type="submit">
-                                Send
-                            </button>
+                            <Button text='Send' />
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
