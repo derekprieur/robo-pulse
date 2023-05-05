@@ -1,12 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+
 import { formatDate } from '../../utils/formatDate';
 import { fetchFavoritedArticles } from '../../utils/fetchFavoritedArticles';
 import { setFavoritedArticles } from '../../redux/favoritesSlice';
+import { showMoreArticles } from '../../utils/showMoreArticles';
+import { Button } from '../../components';
 
 const Profile = () => {
     const currentUser = useSelector((state) => state.user.currentUser);
     const favoritedArticles = useSelector((state) => state.favorites.favoritedArticles);
+    const [visibleArticles, setVisibleArticles] = useState(6);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -43,7 +47,7 @@ const Profile = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                        {favoritedArticles.map((article, index) => (
+                        {favoritedArticles.slice(0, visibleArticles).map((article, index) => (
                             <div
                                 key={article.url + index}
                                 className="rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800 flex flex-col justify-between"
@@ -68,6 +72,11 @@ const Profile = () => {
                                 </div>
                             </div>
                         ))}
+                        {visibleArticles < favoritedArticles.length && (
+                            <div className='col-span-1 md:col-span-2 xl:col-span-3'>
+                                <Button onClick={() => showMoreArticles(setVisibleArticles, 6)} text='Show More' />
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

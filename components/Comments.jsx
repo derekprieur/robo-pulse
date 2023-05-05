@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 
 import { db } from '../firebaseConfig';
 import { Button, CommentCard } from '.';
@@ -29,7 +29,7 @@ const Comments = () => {
         if (commentText.trim() && user) {
             try {
                 await addDoc(collection(db, 'comments'), {
-                    userId: user.email, text: commentText, displayName: user.displayName, photoURL: user.photoURL, articleTitle: articleTitle,
+                    userId: user.email, text: commentText, displayName: user.displayName, photoURL: user.photoURL, articleTitle: articleTitle, timestamp: serverTimestamp(),
                 });
                 setCommentText('');
                 fetchComments();

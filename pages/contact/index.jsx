@@ -15,6 +15,22 @@ const Contact = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!formData.name) {
+            toast.error('Please enter your name to send a message.', {
+                duration: 5000,
+            });
+            return;
+        } else if (!formData.email) {
+            toast.error('Please enter your email to send a message.', {
+                duration: 5000,
+            });
+            return;
+        } else if (!formData.message) {
+            toast.error('Please enter a message to send.', {
+                duration: 5000,
+            });
+            return;
+        }
         const response = await fetch('https://formspree.io/f/xnqywabw', {
             method: 'POST', headers: { 'Content-Type': 'application/json', }, body: JSON.stringify(formData),
         });
@@ -50,19 +66,19 @@ const Contact = () => {
                             <label className="block text-secondary dark:text-white text-sm font-bold mb-2" htmlFor="name">
                                 Name
                             </label>
-                            <input className="shadow appearance-none border rounded w-full py-2 px-3 text-secondary dark:text-white leading-tight focus:outline-none focus:shadow-outline" id="name" type="text" placeholder="Your Name" name="name" value={formData.name} onChange={handleChange} />
+                            <input className="shadow appearance-none border rounded w-full py-2 px-3 text-secondary dark:text-black leading-tight focus:outline-none focus:shadow-outline" id="name" type="text" placeholder="Your Name" name="name" value={formData.name} onChange={handleChange} />
                         </div>
                         <div className="mb-4">
                             <label className="block text-secondary dark:text-white text-sm font-bold mb-2" htmlFor="email">
                                 Email
                             </label>
-                            <input className="shadow appearance-none border rounded w-full py-2 px-3 text-secondary dark:text-white leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Your Email" name="email" value={formData.email} onChange={handleChange} />
+                            <input className="shadow appearance-none border rounded w-full py-2 px-3 text-secondary dark:text-black leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Your Email" name="email" value={formData.email} onChange={handleChange} />
                         </div>
                         <div>
                             <label className="block text-secondary dark:text-white text-sm font-bold mb-2" htmlFor="message">
                                 Message
                             </label>
-                            <textarea className="shadow appearance-none border rounded w-full py-2 px-3 text-secondary dark:text-white h-32 leading-tight focus:outline-none focus:shadow-outline" id="message" placeholder="Your Message" name="message" value={formData.message} onChange={handleChange}
+                            <textarea className="shadow appearance-none border rounded w-full py-2 px-3 text-secondary dark:text-black h-32 leading-tight focus:outline-none focus:shadow-outline" id="message" placeholder="Your Message" name="message" value={formData.message} onChange={handleChange}
                             ></textarea>
                         </div>
                         <div className="flex items-center justify-between">

@@ -85,10 +85,10 @@ const Home = () => {
     <div className="bg-background dark:bg-gray-900 min-h-screen">
       <div className="container mx-auto py-10 px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="col-span-3 md:col-span-1">
+          <div className="col-span-3 lg:col-span-1">
             <Sidebar onSearch={handleSearchWrapper} />
           </div>
-          <div className="col-span-3 md:col-span-2">
+          <div className="col-span-3 lg:col-span-2">
             <h1 className="text-primary dark:text-white text-3xl font-semibold mb-8">Breaking News</h1>
             {filteredArticles.length === 0 ? (
               <div className="text-center text-secondary dark:text-white text-xl">
