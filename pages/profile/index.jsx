@@ -1,17 +1,62 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-hot-toast';
 
 import { formatDate } from '../../utils/formatDate';
 import { fetchFavoritedArticles } from '../../utils/fetchFavoritedArticles';
 import { setFavoritedArticles } from '../../redux/favoritesSlice';
 import { showMoreArticles } from '../../utils/showMoreArticles';
 import { Button } from '../../components';
+import { unfavoriteArticle } from '../../utils/unfavoriteArticle';
 
 const Profile = () => {
     const currentUser = useSelector((state) => state.user.currentUser);
     const favoritedArticles = useSelector((state) => state.favorites.favoritedArticles);
     const [visibleArticles, setVisibleArticles] = useState(6);
     const dispatch = useDispatch();
+
+    const confirmUnfavorite = (article) => {
+        return new Promise((resolve) => {
+            const onConfirm = () => {
+                resolve(true);
+                toast.dismiss(toastId);
+            };
+
+            const onCancel = () => {
+                resolve(false);
+                toast.dismiss(toastId);
+            };
+
+            const toastActions = (
+                <>
+                    <button
+                        onClick={onConfirm}
+                        className="text-white bg-red-500 py-1 px-2 rounded mr-2"
+                    >
+                        Yes
+                    </button>
+                    <button
+                        onClick={onCancel}
+                        className="text-white bg-gray-500 py-1 px-2 rounded"
+                    >
+                        No
+                    </button>
+                </>
+            );
+
+            const toastId = toast(
+                <div>
+                    <p>Are you sure you want to remove this article from your favorites?</p>
+                    {toastActions}
+                </div>,
+                {
+                    id: 'unfavorite-article-toast',
+                    duration: null,
+                    dismissible: true,
+                }
+            );
+        });
+    };
 
     useEffect(() => {
         if (currentUser) {
@@ -28,6 +73,21 @@ const Profile = () => {
             dispatch(setFavoritedArticles([]));
         }
     }, [currentUser]);
+
+    const handleUnfavorite = async (article) => {
+        const confirmed = await confirmUnfavorite(article);
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            await unfavoriteArticle(currentUser, article);
+            dispatch(setFavoritedArticles(favoritedArticles.filter(item => item.url !== article.url)));
+        } catch (error) {
+            console.error('Error unfavoriting article:', error);
+        }
+    };
+
 
     if (!currentUser) {
         return (
@@ -69,6 +129,9 @@ const Profile = () => {
                                     <p className="text-secondary dark:text-white">
                                         {formatDate(article.publishedAt)}
                                     </p>
+                                    <button onClick={() => handleUnfavorite(article)} className="text-white bg-red-500 py-1 px-2 rounded">
+                                        Remove
+                                    </button>
                                 </div>
                             </div>
                         ))}
