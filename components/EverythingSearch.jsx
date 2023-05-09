@@ -19,7 +19,7 @@ const EverythingSearch = () => {
 
     return (
         <div className="w-full">
-            <h2 className="text-primary dark:text-white text-3xl font-semibold mb-8">More Recent Articles</h2>
+            {filteredArticles.length > 6 && <h2 className="text-primary dark:text-white text-3xl font-semibold mb-8">More Recent Articles</h2>}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
                 {filteredArticles.slice(6, 6 + visibleArticles).map((article, index) => (
                     <div key={article.url + index} className="col-span-4 md:col-span-1 rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800 flex flex-col justify-between">
